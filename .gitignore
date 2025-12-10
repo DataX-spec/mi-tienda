@@ -34,3 +34,4 @@ auth.json
 
 /public/build
 /storage/pail
+"!database/database.sqlite" 
