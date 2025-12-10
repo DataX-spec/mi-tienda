@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Producto;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Schema;
 
 class ProductoController extends Controller
 {
@@ -13,8 +14,20 @@ class ProductoController extends Controller
      */
     public function home()
     {
-        $productos = Producto::latest()->paginate(12);
-        return view('productos.index', compact('productos')); 
+        try {
+            if (!Schema::hasTable('productos')) {
+                return view('productos.index', ['productos' => collect()]);
+            }
+            $productos = Producto::latest()->paginate(12);
+        } catch (\Exception $e) {
+            $productos = collect(); // vacío si falla
+        }
+
+        if (!view()->exists('productos.index')) {
+            abort(500, 'La vista productos.index no existe');
+        }
+
+        return view('productos.index', compact('productos'));
     }
 
     /**
@@ -22,7 +35,15 @@ class ProductoController extends Controller
      */
     public function index()
     {
-        $productos = Producto::latest()->paginate(15);
+        try {
+            if (!Schema::hasTable('productos')) {
+                return view('productos.index', ['productos' => collect()]);
+            }
+            $productos = Producto::latest()->paginate(15);
+        } catch (\Exception $e) {
+            $productos = collect();
+        }
+
         return view('productos.index', compact('productos'));
     }
 
@@ -31,6 +52,9 @@ class ProductoController extends Controller
      */
     public function create()
     {
+        if (!view()->exists('productos.create')) {
+            abort(500, 'La vista productos.create no existe');
+        }
         return view('productos.create');
     }
 
@@ -40,6 +64,10 @@ class ProductoController extends Controller
     public function store(Request $request)
     {
         try {
+            if (!Schema::hasTable('productos')) {
+                return back()->with('error', '❌ La tabla productos no está disponible. Verifica las migraciones.');
+            }
+
             $validated = $request->validate([
                 'nombre' => ['required', 'string', 'max:255', 'unique:productos,nombre'],
                 'descripcion' => ['nullable', 'string'],
@@ -57,6 +85,9 @@ class ProductoController extends Controller
 
                 if (!file_exists($rutaDestino)) {
                     mkdir($rutaDestino, 0755, true);
+                }
+                if (!is_writable($rutaDestino)) {
+                    return back()->with('error', '❌ No se puede escribir en la carpeta de imágenes.');
                 }
 
                 $finalName = $nombreImagen;
@@ -84,7 +115,16 @@ class ProductoController extends Controller
      */
     public function show($id)
     {
-        $producto = Producto::findOrFail($id);
+        try {
+            $producto = Producto::findOrFail($id);
+        } catch (\Exception $e) {
+            abort(404, 'Producto no encontrado');
+        }
+
+        if (!view()->exists('productos.show')) {
+            abort(500, 'La vista productos.show no existe');
+        }
+
         return view('productos.show', compact('producto'));
     }
 
@@ -93,7 +133,16 @@ class ProductoController extends Controller
      */
     public function edit($id)
     {
-        $producto = Producto::findOrFail($id);
+        try {
+            $producto = Producto::findOrFail($id);
+        } catch (\Exception $e) {
+            abort(404, 'Producto no encontrado');
+        }
+
+        if (!view()->exists('productos.edit')) {
+            abort(500, 'La vista productos.edit no existe');
+        }
+
         return view('productos.edit', compact('producto'));
     }
 
@@ -103,6 +152,10 @@ class ProductoController extends Controller
     public function update(Request $request, $id)
     {
         try {
+            if (!Schema::hasTable('productos')) {
+                return back()->with('error', '❌ La tabla productos no está disponible. Verifica las migraciones.');
+            }
+
             $producto = Producto::findOrFail($id);
 
             $validated = $request->validate([
@@ -122,6 +175,9 @@ class ProductoController extends Controller
 
                 if (!file_exists($rutaDestino)) {
                     mkdir($rutaDestino, 0755, true);
+                }
+                if (!is_writable($rutaDestino)) {
+                    return back()->with('error', '❌ No se puede escribir en la carpeta de imágenes.');
                 }
 
                 $finalName = $nombreImagen;
@@ -180,31 +236,39 @@ class ProductoController extends Controller
      */
     public function search(Request $request)
     {
-        $q = $request->input('q');
-        $categoria = $request->input('categoria');
-        $min = $request->input('min');
-        $max = $request->input('max');
+        try {
+            if (!Schema::hasTable('productos')) {
+                return view('productos.index', ['productos' => collect()]);
+            }
 
-        $productos = Producto::query()
-            ->when($q, fn($query) =>
-                $query->where(function($sub) use ($q) {
-                    $sub->where('nombre', 'like', "%{$q}%")
-                        ->orWhere('descripcion', 'like', "%{$q}%");
-                })
-            )
-            ->when($categoria, fn($query) =>
-                $query->where('categoria', $categoria)
-            )
-            ->when(strlen($min ?? '') > 0, fn($query) =>
-                $query->where('precio', '>=', (float) $min)
-            )
-            ->when(strlen($max ?? '') > 0, fn($query) =>
-                $query->where('precio', '<=', (float) $max)
-            )
-            ->latest()
-            ->paginate(15)
-            ->appends($request->query());
+            $q = $request->input('q');
+            $categoria = $request->input('categoria');
+            $min = $request->input('min');
+            $max = $request->input('max');
 
-        return view('productos.index', compact('productos'));
+            $productos = Producto::query()
+                ->when($q, fn($query) =>
+                    $query->where(function($sub) use ($q) {
+                        $sub->where('nombre', 'like', "%{$q}%")
+                            ->orWhere('descripcion', 'like', "%{$q}%");
+                    })
+                )
+                ->when($categoria, fn($query) =>
+                    $query->where('categoria', $categoria)
+                )
+                ->when(strlen($min ?? '') > 0, fn($query) =>
+                    $query->where('precio', '>=', (float) $min)
+                )
+                ->when(strlen($max ?? '') > 0, fn($query) =>
+                    $query->where('precio', '<=', (float) $max)
+                )
+                ->latest()
+                ->paginate(15)
+                ->appends($request->query());
+
+            return view('productos.index', compact('productos'));
+        } catch (\Exception $e) {
+            return view('productos.index', ['productos' => collect()]);
+        }
     }
 }
