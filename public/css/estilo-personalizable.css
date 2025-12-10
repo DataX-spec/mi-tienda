@@ -1,0 +1,225 @@
+/* ===== Reset básico y tipografía ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --bg-dark: #0f172a;
+    --panel-dark: #111827;
+    --neon-green: #10b981;
+    --neon-green-2: #4ade80;
+    --electric-blue: #06b6d4;
+    --electric-blue-2: #22d3ee;
+    --text-light: #e5e7eb;
+}
+
+/* ===== Body y contenedores ===== */
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-light);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+/* ===== Navbar ===== */
+.navbar {
+    background: linear-gradient(90deg, var(--bg-dark) 0%, #1a3a35 100%);
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.08);
+    border-bottom: 2px solid var(--neon-green);
+}
+
+.navbar-brand,
+.navbar .nav-link {
+    color: var(--neon-green-2) !important;
+    font-weight: 500;
+    transition: all 0.22s ease;
+    text-shadow: 0 0 8px rgba(74, 222, 128, 0.18);
+}
+
+.navbar .nav-link:hover {
+    color: var(--electric-blue) !important;
+    text-shadow: 0 0 12px rgba(6, 182, 212, 0.22);
+    transform: translateY(-2px);
+}
+
+.navbar .nav-link.active {
+    color: var(--electric-blue) !important;
+    font-weight: 700;
+    text-decoration: underline;
+}
+
+/* ===== Botones ===== */
+.btn-primary {
+    background: linear-gradient(135deg, var(--neon-green) 0%, var(--electric-blue) 100%);
+    border: 2px solid var(--electric-blue);
+    color: var(--bg-dark);
+    font-weight: 700;
+    transition: transform .18s ease, box-shadow .18s ease;
+    box-shadow: 0 0 12px rgba(34, 211, 238, 0.18);
+}
+.btn-primary:hover,
+.btn-primary:focus {
+    transform: scale(1.04);
+    box-shadow: 0 0 24px rgba(34, 211, 238, 0.28);
+}
+
+/* ===== Footer ===== */
+footer {
+    background: linear-gradient(180deg, #1a3a35 0%, var(--bg-dark) 100%);
+    color: var(--neon-green-2);
+    border-top: 2px solid var(--neon-green);
+    padding: 1.25rem 0;
+    box-shadow: 0 -4px 15px rgba(16, 185, 129, 0.06);
+}
+footer a {
+    color: var(--electric-blue);
+    text-decoration: none;
+    transition: color .18s ease;
+}
+footer a:hover { color: var(--neon-green-2); }
+
+/* ===== Enlaces globales ===== */
+a { color: var(--electric-blue); transition: color .18s ease; }
+a:hover { color: var(--neon-green-2); }
+
+/* ===== Títulos ===== */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--neon-green-2);
+    margin-bottom: .5rem;
+    animation: pulseGlow 3s infinite;
+}
+
+/* ===== Panel principal ===== */
+main {
+    background-color: var(--panel-dark);
+    border-radius: 12px;
+    padding: 2rem;
+    margin: 2rem 0;
+    border: 1px solid rgba(16, 185, 129, 0.06);
+    box-shadow: 0 6px 30px rgba(2, 6, 23, 0.6);
+}
+
+/* ===== Splash Screen ===== */
+#splash-screen {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(135deg, var(--bg-dark) 0%, #1a3a35 50%, var(--bg-dark) 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 99999;
+    padding: 1rem;
+    overflow: hidden;
+}
+#splash-screen::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 30% 50%, rgba(16,185,129,0.06) 0%, transparent 35%),
+      radial-gradient(circle at 70% 50%, rgba(6,182,212,0.04) 0%, transparent 35%);
+    z-index: -1;
+}
+.logo-splash {
+    height: 120px;
+    max-width: 40vw;
+    max-height: 30vh;
+    object-fit: contain;
+    animation: zoomIn .9s cubic-bezier(.2,.9,.3,1);
+    filter: drop-shadow(0 0 16px rgba(16,185,129,0.35));
+}
+#splash-screen h1 {
+    font-size: 1.8rem;
+    color: var(--neon-green-2);
+    margin-top: .65rem;
+    text-align: center;
+    letter-spacing: 1.5px;
+    text-shadow: 0 0 18px rgba(74,222,128,0.35), 0 0 36px rgba(6,182,212,0.18);
+    animation: fadeInUp .9s ease;
+}
+
+/* ===== Animaciones ===== */
+@keyframes zoomIn {
+    from { transform: scale(.6); opacity:0; }
+    to { transform: scale(1); opacity:1; }
+}
+@keyframes fadeInUp {
+    from { transform: translateY(14px); opacity:0; }
+    to { transform: translateY(0); opacity:1; }
+}
+@keyframes pulseGlow {
+    0% { text-shadow: 0 0 10px var(--electric-blue-2); }
+    50% { text-shadow: 0 0 20px #38bdf8; }
+    100% { text-shadow: 0 0 10px var(--electric-blue-2); }
+}
+
+/* ===== Tarjetas ===== */
+.card {
+    background-color: #1f2937;
+    border: 1px solid rgba(16,185,129,0.06);
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(2,6,23,0.6);
+    transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+}
+.card:hover {
+    transform: translateY(-6px);
+    border-color: var(--electric-blue);
+    box-shadow: 0 10px 34px rgba(6,182,212,0.12);
+}
+.card-header {
+    background: linear-gradient(90deg, var(--neon-green) 0%, var(--electric-blue) 100%);
+    color: var(--bg-dark);
+    font-weight: 700;
+    border-radius: 10px 10px 0 0;
+}
+.card-body { color: var(--text-light); }
+
+/* ===== Producto card ===== */
+.producto-card {
+    background-color: #1e293b;
+    border: 1px solid var(--electric-blue-2);
+    box-shadow: 0 0 15px var(--electric-blue-2);
+    border-radius: 10px;
+    transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+    padding: 1rem;
+}
+.producto-card:hover {
+    transform: scale(1.03);
+    box-shadow: 0 10px 28px rgba(56,189,248,0.12);
+    border-color: var(--electric-blue);
+}
+.producto-card input,
+.producto-card textarea {
+    background-color: var(--bg-dark);
+    color: var(--text-light);
+    border: 1px solid var(--electric-blue-2);
+    padding: .5rem;
+    border-radius: .375rem;
+}
+.producto-card input:focus,
+.producto-card textarea:focus {
+    outline: none;
+    box-shadow: 0 0 10px rgba(56,189,248,0.12);
+    border-color: var(--electric-blue);
+}
+
+/* ===== Utilidades neon ===== */
+.text-neon {
+    color: var(--electric-blue);
+    text-shadow: 0 0 6px var(--electric-blue-2);
+}
+
+/* ===== Responsive ===== */
+@media (max-width:576px) {
+    body { font
