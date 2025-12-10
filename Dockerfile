@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     sqlite3 \
     libsqlite3-dev \
-    && docker-php-ext-install pdo pdo_mysql zip
+    && docker-php-ext-install pdo pdo_sqlite pdo_mysql zip
 
 # Instalar Composer
 RUN curl -sS https://getcomposer.org/installer | php -- \
@@ -27,7 +27,7 @@ RUN composer install --no-dev --prefer-dist --no-interaction --no-progress
 # Preparar entorno y base de datos
 RUN php -r "file_exists('.env') || copy('.env.example', '.env');" && \
     php artisan key:generate --force && \
-    touch database/database.sqlite && \
+    mkdir -p database && touch database/database.sqlite && \
     php artisan migrate --force && \
     php artisan storage:link || true
 
